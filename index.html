@@ -10,19 +10,223 @@
     <link rel="icon" type="image/png" href="favicon.png">
 
     <style>
+        :root {
+            --elf-background-color: #fafafa;
+            --elf-primary-color: #333333;
+            --elf-secondary-color: #eeeeee;
+
+            --elf-accent-light-color: #d2caef;
+            --elf-accent-color: #8f83ed;
+            --elf-accent-text-color: #6f63cf;
+
+            --elf-neutral-light-color: #b9b9b9;
+            --elf-neutral-color: #7f7f7f;
+            --elf-neutral-text-color: #333333;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --elf-background-color: #131313;
+                --elf-primary-color: #eeeeee;
+                --elf-secondary-color: #333333;
+
+                --elf-accent-light-color: #b0e9d5;
+                --elf-accent-color: #00a97d;
+                --elf-accent-text-color: #1a9473;
+            }
+        }
+
         body * {
             font-family: "Quicksand", sans-serif;
             box-sizing: border-box;
         }
 
-        p {
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 18px;
+            padding: 20px;
+            margin: 0;
+            color: var(--elf-primary-color);
+            background-color: var(--elf-background-color);
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--elf-accent-text-color);
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: 600;
             text-align: center;
+        }
+
+        .form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background-color: var(--elf-secondary-color);
+            padding: 30px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        .numbers {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+            max-width: 300px;
+        }
+
+        .number {
+            border-radius: 6px;
+            padding: 4px 8px;
+            background-color: var(--elf-accent-light-color);
+            font-weight: 500;
+            color: var(--elf-accent-text-color);
+            font-size: 28px;
+        }
+
+        .button {
+            --elf-btn-background: var(--elf-accent-light-color);
+            --elf-btn-shadow: var(--elf-accent-color);
+            --elf-btn-color: var(--elf-accent-text-color);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            width: 100%;
+            padding: 12px 32px;
+            gap: 8px;
+            background: var(--elf-btn-background);
+            color: var(--elf-btn-color);
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 6px;
+            box-shadow: 4px 4px 1px 0px var(--elf-btn-shadow);
+            transition: all 0.2s;
+            outline: none;
+            text-decoration: none;
+            user-select: none;
+        }
+
+        .button:hover,
+        .button:focus {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 1px 0px var(--elf-btn-shadow);
+        }
+
+        .button:active {
+            transform: translate(3px, 3px);
+            box-shadow: none;
+        }
+
+        label {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px 20px;
+            position: relative;
+        }
+
+        .label-text {
+            position: absolute;
+            left: 10px;
+            top: -5px;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 6px;
+            color: var(--elf-neutral-text-color);
+            background: var(--elf-neutral-light-color);
+        }
+
+        input {
+            flex: 1;
+            min-width: 160px;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #cccccc;
+            border-radius: 6px;
+            font-size: 16px;
+            text-align: center;
+            outline-color: var(--elf-accent-light-color);
+            font-weight: 600;
+            background: #ffffff;
+            color: var(--elf-neutral-text-color);
+        }
+
+        .error {
+            display: none;
+            text-align: center;
+            font-size: 14px;
         }
     </style>
 </head>
 
 <body>
-    <p>Random Number Generator</p>
+    <div class="title">Random Number Generator</div>
+
+    <div id="result" class="numbers">
+    </div>
+
+    <div class="form">
+        <label>
+            <span class="label-text">Min</span>
+            <input type="number" id="min" value="1">
+        </label>
+        <label>
+            <span class="label-text">Max</span>
+            <input type="number" id="max" value="100">
+        </label>
+        <label>
+            <span class="label-text">Num</span>
+            <input type="number" id="num" value="1" min="1">
+        </label>
+        <div id="error" class="error"></div>
+        <div class="button" onclick="generateRandomNumbers()">Get numbers</div>
+    </div>
+
+    <div class="author">
+        <span>Created by <a href="https://anastasiaelf.com/" target="_blank">AnastasiaElf</a></span>
+    </div>
+
+    <script>
+        function generateRandomNumbers() {
+            const num = parseInt(document.getElementById('num').value);
+            const min = parseInt(document.getElementById('min').value);
+            const max = parseInt(document.getElementById('max').value);
+
+            const errorDiv = document.getElementById('error');
+            errorDiv.innerHTML = '';
+            errorDiv.style.display = "none";
+
+            if (isNaN(num) || isNaN(min) || isNaN(max) || num <= 0 || min >= max || (max - min + 1) < num) {
+                errorDiv.innerHTML = 'Please enter valid values';
+                errorDiv.style.display = "block";
+                return;
+            }
+
+            const resultsDiv = document.getElementById('result');
+            resultsDiv.innerHTML = '';
+
+            const uniqueNumbers = new Set();
+
+            while (uniqueNumbers.size < num) {
+                const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+                uniqueNumbers.add(randomNumber);
+            }
+
+            uniqueNumbers.forEach(number => {
+                resultsDiv.innerHTML += `<div class="number">${number}</div>`;
+            });
+        }
+    </script>
 </body>
 
 </html>
