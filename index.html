@@ -75,7 +75,7 @@
         }
 
         .numbers {
-            display: flex;
+            display: none;
             flex-wrap: wrap;
             justify-content: center;
             gap: 16px;
@@ -214,6 +214,7 @@
 
             const resultsDiv = document.getElementById('result');
             resultsDiv.innerHTML = '';
+            resultsDiv.style.display = 'flex';
 
             const uniqueNumbers = new Set();
 
